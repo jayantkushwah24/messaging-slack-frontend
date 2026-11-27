@@ -1,26 +1,38 @@
-import { signInRequest } from "@/api/auth";
+import { signUpRequest } from "@/api/auth";
+import { toast } from "@/components/ui/toast-manager";
 import { useMutation } from "@tanstack/react-query";
 
 export const useSignup = () => {
   const {
     isSuccess,
-    isError,
+    isPending,
     error,
-    mutate: singupMutation,
+    mutateAsync: signupMutation,
   } = useMutation({
-    mutationFn: signInRequest,
-    onSuccess: (data) => {
-      console.log("successfully signed up: ", data);
+    mutationFn: signUpRequest,
+    onSuccess: () => {
+      toast.add({
+        title: "Successfully Signed Up",
+        description: "You will be redirected to the login page.",
+        type: "success",
+      });
     },
     onError: (error) => {
-      console.error("failed to signup: ", error);
+      toast.add({
+        title: "Signup Failed",
+        description:
+          error?.response?.data?.message ||
+          error?.message ||
+          "An error occurred during signup.",
+        type: "error",
+      });
     },
   });
 
   return {
     isSuccess,
-    isError,
+    isPending,
     error,
-    singupMutation,
+    signupMutation,
   };
 };
